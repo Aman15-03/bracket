@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Bracket Generator</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #2980b9;
+        }
+
+        h3 {
+            color: #16a085;
+        }
+
+        /* Form Styles */
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-option input {
+            margin-right: 8px;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-primary {
+            background-color: #2ecc71;
+        }
+
+        .btn-primary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* Bracket Styles */
+        .bracket {
+            display: flex;
+            overflow-x: auto;
+            margin-top: 30px;
+            padding: 20px 0;
+        }
+
+        .round {
+            min-width: 250px;
+            margin-right: 30px;
+        }
+
+        .round h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .match {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+
+        .participant {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 5px;
+            margin: 5px 0;
+            background-color: white;
+            border-radius: 3px;
+        }
+
+        .participant.winner {
+            background-color: #e8f8f5;
+            font-weight: bold;
+        }
+
+        .vs {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #7f8c8d;
+        }
+
+        .champion {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1c40f;
+            border-radius: 4px;
+        }
+
+        /* Checkbox Styles */
+        .winner-option {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .winner-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .winner-option input {
+            margin-right: 10px;
+        }
+
+        /* File Upload */
+        .file-upload {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .file-name {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* Sample Data Buttons */
+        .sample-data {
+            margin-top: 15px;
+        }
+
+        .sample-data .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        /* Winners List Styles */
+        .winners-list {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .winners-list h3 {
+            margin-top: 0;
+            color: #27ae60;
+        }
+        
+        .winners-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .winners-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .winner-highlight {
+            background-color: #e8f8f5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tournament Tracker Creator</h1>
+        
+        <div class="form-section">
+            <h2>Tournament Configuration</h2>
+            
+            <div class="form-group">
+                <label for="tournamentName">Tournament Name</label>
+                <input type="text" id="tournamentName" placeholder="e.g., 2023 Championship">
+            </div>
+            
+            <div class="form-group">
+                <label>Game Type</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="teamType" name="gameType" value="team" checked>
+                        <label for="teamType">Team-based</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="individualType" name="gameType" value="individual">
+                        <label for="individualType">Individual</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="gameSelection">Game Selection</label>
+                <select id="gameSelection">
+                    <optgroup label="Sports">
+                        <option value="Football">Football (Soccer)</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Cricket">Cricket</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Baseball">Baseball</option>
+                        <option value="Volleyball">Volleyball</option>
+                        <option value="Hockey">Hockey</option>
+                        <option value="Boxing">Boxing</option>
+                        <option value="Wrestling">Wrestling</option>
+                        <option value="Martial Arts">Martial Arts</option>
+                    </optgroup>
+                    <optgroup label="Esports">
+                        <option value="League of Legends">League of Legends</option>
+                        <option value="Dota 2">Dota 2</option>
+                        <option value="Counter-Strike">Counter-Strike</option>
+                        <option value="Valorant">Valorant</option>
+                        <option value="Street Fighter">Street Fighter</option>
+                        <option value="Tekken">Tekken</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Tracker Type</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="singleElimination" name="trackerType" value="single" checked>
+                        <label for="singleElimination">Single Elimination</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="doubleElimination" name="trackerType" value="double">
+                        <label for="doubleElimination">Double Elimination</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Team Names</label>
+                <div id="teamEntries">
+                    <div class="team-entry">
+                        <input type="text" class="team-name" placeholder="Enter team name">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" id="addTeamBtn">Add Team</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Upload Team List</label>
+                <div class="file-upload">
+                    <label for="teamFile" class="file-upload-label">Choose File</label>
+                    <input type="file" id="teamFile" accept=".csv">
+                    <span class="file-name" id="fileName">No file chosen</span>
+                </div>
+                <small>Upload CSV with team names (one per line)</small>
+            </div>
+            
+            <div class="form-group sample-data">
+                <label>Or download sample data:</label>
+                <button type="button" class="btn btn-secondary" id="teamTournamentBtn">Team Tournament</button>
+                <button type="button" class="btn btn-secondary" id="combatSportsBtn">Combat Sports</button>
+                <button type="button" class="btn btn-secondary" id="esportsTeamsBtn">Esports Teams</button>
+            </div>
+            
+            <div class="form-group">
+                <div class="radio-option">
+                    <input type="checkbox" id="useSeeding" checked>
+                    <label for="useSeeding">Use seeding</label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" id="generateBracketBtn">Generate Bracket</button>
+                <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+            </div>
+        </div>
+        
+        <div id="bracketContainer" style="display: none;">
+            <h2 id="bracketTitle">Tournament Bracket</h2>
+            <div id="bracket" class="bracket"></div>
+            
+            <div class="winners-list">
+                <h3>Winners for Next Schedule</h3>
+                <ul id="winnersList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const addTeamBtn = document.getElementById('addTeamBtn');
+            const teamEntries = document.getElementById('teamEntries');
+            const teamFile = document.getElementById('teamFile');
+            const fileName = document.getElementById('fileName');
+            const generateBracketBtn = document.getElementById('generateBracketBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const bracketContainer = document.getElementById('bracketContainer');
+            const bracket = document.getElementById('bracket');
+            const bracketTitle = document.getElementById('bracketTitle');
+            const winnersList = document.getElementById('winnersList');
+            
+            // Sample data buttons
+            const teamTournamentBtn = document.getElementById('teamTournamentBtn');
+            const combatSportsBtn = document.getElementById('combatSportsBtn');
+            const esportsTeamsBtn = document.getElementById('esportsTeamsBtn');
+            
+            // File upload handler
+            teamFile.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                    
+                    // Read the file and populate team names
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const content = event.target.result;
+                        const teams = content.split('\n').filter(team => team.trim() !== '');
+                        
+                        // Clear existing entries
+                        teamEntries.innerHTML = '';
+                        
+                        // Add new entries
+                        teams.forEach(team => {
+                            addTeamEntry(team.trim());
+                        });
+                    };
+                    reader.readAsText(this.files[0]);
+                } else {
+                    fileName.textContent = 'No file chosen';
+                }
+            });
+            
+            // Add team entry
+            function addTeamEntry(value = '') {
+                const entry = document.createElement('div');
+                entry.className = 'team-entry';
+                entry.innerHTML = `
+                    <input type="text" class="team-name" placeholder="Enter team name" value="${value}">
+                    <button type="button" class="btn btn-secondary remove-team">Remove</button>
+                `;
+                teamEntries.appendChild(entry);
+                
+                // Add remove handler
+                entry.querySelector('.remove-team').addEventListener('click', function() {
+                    entry.remove();
+                });
+            }
+            
+            // Add team button handler
+            addTeamBtn.addEventListener('click', function() {
+                addTeamEntry();
+            });
+            
+            // Sample data handlers
+            teamTournamentBtn.addEventListener('click', function() {
+                // Clear existing entries
+                teamEntries.innerHTML = '';
+                
+                // Add sample teams
+                const teams = [
+                    'Team A', 'Team B', 'Team C', 'Team D', 
+                    'Team E', 'Team F', 'Team G', 'Team H'
+                ];
+                
+                teams.forEach(team => {
+                    addTeamEntry(team);
+                });
+                
+                // Set tournament name
+                document.getElementById('tournamentName').value = '2023 Team Tournament';
+            });
+            
+            combatSportsBtn.addEventListener('click', function() {
+                // Clear existing entries
+                teamEntries.innerHTML = '';
+                
+                // Add sample combat sports participants
+                const fighters = [
+                    'John Smith (Lightweight)', 'Mike Tyson (Heavyweight)', 
+                    'Connor McGregor (Welterweight)', 'Amanda Nunes (Bantamweight)',
+                    'Khabib Nurmagomedov (Lightweight)', 'Israel Adesanya (Middleweight)',
+                    'Valentina Shevchenko (Flyweight)', 'Francis Ngannou (Heavyweight)'
+                ];
+                
+                fighters.forEach(fighter => {
+                    addTeamEntry(fighter);
+                });
+                
+                // Set tournament name and type
+                document.getElementById('tournamentName').value = '2023 Combat Championship';
+                document.getElementById('gameSelection').value = 'boxing';
+            });
+            
+            esportsTeamsBtn.addEventListener('click', function() {
+                // Clear existing entries
+                teamEntries.innerHTML = '';
+                
+                // Add sample esports teams
+                const esportsTeams = [
+                    'Cloud9', 'Team Liquid', 'Fnatic', 'G2 Esports',
+                    'T1', 'Team Secret', 'Evil Geniuses', '100 Thieves'
+                ];
+                
+                esportsTeams.forEach(team => {
+                    addTeamEntry(team);
+                });
+                
+                // Set tournament name and type
+                document.getElementById('tournamentName').value = '2023 Esports Championship';
+                document.getElementById('gameSelection').value = 'lol';
+            });
+            
+            // Reset button handler
+            resetBtn.addEventListener('click', function() {
+                // Clear form
+                document.getElementById('tournamentName').value = '';
+                document.getElementById('teamType').checked = true;
+                document.getElementById('gameSelection').value = 'football';
+                document.getElementById('singleElimination').checked = true;
+                teamEntries.innerHTML = '';
+                addTeamEntry(); // Add one empty entry
+                fileName.textContent = 'No file chosen';
+                teamFile.value = '';
+                document.getElementById('useSeeding').checked = true;
+                
+                // Hide bracket and clear winners
+                bracketContainer.style.display = 'none';
+                winnersList.innerHTML = '';
+            });
+            
+            // Generate bracket button handler
+            generateBracketBtn.addEventListener('click', function() {
+                const tournamentName = document.getElementById('tournamentName').value || 'Tournament';
+                const useSeeding = document.getElementById('useSeeding').checked;
+                
+                // Get team names
+                const teamInputs = document.querySelectorAll('.team-name');
+                let teams = Array.from(teamInputs).map(input => input.value.trim()).filter(name => name !== '');
+                
+                // Validate at least 2 teams
+                if (teams.length < 2) {
+                    alert('Please add at least 2 teams/participants');
+                    return;
+                }
+                
+                // Set bracket title
+                bracketTitle.textContent = tournamentName;
+                
+                // Clear previous winners
+                winnersList.innerHTML = '';
+                
+                // Generate bracket
+                generateBracket(teams, useSeeding);
+                
+                // Show bracket
+                bracketContainer.style.display = 'block';
+            });
+            
+            // Function to generate bracket
+            function generateBracket(teams, useSeeding) {
+                // Clear previous bracket
+                bracket.innerHTML = '';
+                
+                // If seeding is enabled, sort teams alphabetically as a simple seeding method
+                if (useSeeding) {
+                    teams.sort();
+                } else {
+                    // Shuffle teams for random seeding
+                    teams = shuffleArray(teams);
+                }
+                
+                // Calculate number of rounds needed
+                const teamCount = teams.length;
+                const rounds = Math.ceil(Math.log2(teamCount));
+                const totalSlots = Math.pow(2, rounds);
+                const byes = totalSlots - teamCount;
+                
+                // Add byes if needed
+                for (let i = 0; i < byes; i++) {
+                    teams.push('Bye');
+                }
+                
+                // Create rounds
+                let currentRound = teams;
+                let matchCounter = 1;
+                let allMatches = {};
+                
+                for (let round = 0; round < rounds; round++) {
+                    const roundDiv = document.createElement('div');
+                    roundDiv.className = 'round';
+                    
+                    // Round title
+                    const roundTitle = document.createElement('h3');
+                    roundTitle.textContent = getRoundName(round, rounds);
+                    roundDiv.appendChild(roundTitle);
+                    
+                    // Create matches for this round
+                    const nextRound = [];
+                    for (let i = 0; i < currentRound.length; i += 2) {
+                        const team1 = currentRound[i];
+                        const team2 = currentRound[i + 1] || 'Bye';
+                        
+                        const matchDiv = document.createElement('div');
+                        matchDiv.className = 'match';
+                        matchDiv.id = `match-${matchCounter}`;
+                        
+                        // For first round, show actual team names
+                        if (round === 0) {
+                            const team1Div = document.createElement('div');
+                            team1Div.className = 'participant';
+                            team1Div.textContent = `#${i + 1} ${team1}`;
+                            team1Div.dataset.team = team1;
+                            matchDiv.appendChild(team1Div);
+                            
+                            const vsDiv = document.createElement('div');
+                            vsDiv.className = 'vs';
+                            vsDiv.textContent = 'vs';
+                            matchDiv.appendChild(vsDiv);
+                            
+                            const team2Div = document.createElement('div');
+                            team2Div.className = 'participant';
+                            team2Div.textContent = `#${i + 2} ${team2}`;
+                            team2Div.dataset.team = team2;
+                            matchDiv.appendChild(team2Div);
+                        } else {
+                            // For subsequent rounds, show "Winner of Match X"
+                            const prevMatch1 = matchCounter - currentRound.length / 2 + (i / 2);
+                            const prevMatch2 = prevMatch1 + 1;
+                            
+                            const team1Div = document.createElement('div');
+                            team1Div.className = 'participant';
+                            team1Div.textContent = `Winner of Match ${prevMatch1}`;
+                            team1Div.dataset.match = prevMatch1;
+                            matchDiv.appendChild(team1Div);
+                            
+                            const vsDiv = document.createElement('div');
+                            vsDiv.className = 'vs';
+                            vsDiv.textContent = 'vs';
+                            matchDiv.appendChild(vsDiv);
+                            
+                            const team2Div = document.createElement('div');
+                            team2Div.className = 'participant';
+                            team2Div.textContent = `Winner of Match ${prevMatch2}`;
+                            team2Div.dataset.match = prevMatch2;
+                            matchDiv.appendChild(team2Div);
+                        }
+                        
+                        // Add winner selection
+                        const winnerDiv = document.createElement('div');
+                        winnerDiv.style.marginTop = '10px';
+                        
+                        const winnerLabel = document.createElement('div');
+                        winnerLabel.textContent = 'Select Winner:';
+                        winnerLabel.style.fontWeight = 'bold';
+                        winnerLabel.style.marginBottom = '5px';
+                        winnerDiv.appendChild(winnerLabel);
+                        
+                        const option1 = createWinnerOption(matchCounter, 'team1', round === 0 ? team1 : `Winner of Match ${matchCounter - currentRound.length / 2 + (i / 2)}`);
+                        winnerDiv.appendChild(option1);
+                        
+                        const option2 = createWinnerOption(matchCounter, 'team2', round === 0 ? team2 : `Winner of Match ${matchCounter - currentRound.length / 2 + (i / 2) + 1}`);
+                        winnerDiv.appendChild(option2);
+                        
+                        matchDiv.appendChild(winnerDiv);
+                        roundDiv.appendChild(matchDiv);
+                        
+                        // Store match info
+                        allMatches[`match-${matchCounter}`] = {
+                            round: round,
+                            team1: team1,
+                            team2: team2,
+                            winner: null
+                        };
+                        
+                        // For next round, we'll push a placeholder that will be replaced when winner is selected
+                        nextRound.push(`match-${matchCounter}-winner`);
+                        matchCounter++;
+                    }
+                    
+                    bracket.appendChild(roundDiv);
+                    currentRound = nextRound;
+                }
+                
+                // Add champion
+                const championDiv = document.createElement('div');
+                championDiv.className = 'round';
+                
+                const championTitle = document.createElement('h3');
+                championTitle.textContent = 'Champion';
+                championDiv.appendChild(championTitle);
+                
+                const championName = document.createElement('div');
+                championName.className = 'champion';
+                championName.id = 'champion';
+                championName.textContent = 'TBD';
+                championDiv.appendChild(championName);
+                
+                bracket.appendChild(championDiv);
+                
+                // Add event listeners for winner selection
+                document.querySelectorAll('.winner-option input').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const matchId = this.name;
+                        const winnerValue = this.value;
+                        const matchNum = parseInt(matchId.replace('match-', ''));
+                        const match = allMatches[matchId];
+                        
+                        // Update match results
+                        match.winner = winnerValue;
+                        
+                        // Get the winner's name
+                        let winnerName;
+                        if (match.round === 0) {
+                            // First round - winner is either team1 or team2
+                            winnerName = winnerValue === 'team1' ? match.team1 : match.team2;
+                        } else {
+                            // Subsequent rounds - winner comes from previous match
+                            const prevMatchId = winnerValue === 'team1' ? 
+                                `match-${match.team1.replace('Winner of Match ', '')}` : 
+                                `match-${match.team2.replace('Winner of Match ', '')}`;
+                            winnerName = allMatches[prevMatchId].winner === 'team1' ? 
+                                allMatches[prevMatchId].team1 : allMatches[prevMatchId].team2;
+                        }
+                        
+                        // Update the next match that references this winner
+                        for (const [key, nextMatch] of Object.entries(allMatches)) {
+                            if (nextMatch.team1 === `Winner of Match ${matchNum}`) {
+                                nextMatch.team1 = winnerName;
+                                const participantElement = document.querySelector(`.participant[data-match="${matchNum}"]`);
+                                if (participantElement) {
+                                    participantElement.textContent = winnerName;
+                                    participantElement.classList.add('winner-highlight');
+                                }
+                            }
+                            if (nextMatch.team2 === `Winner of Match ${matchNum}`) {
+                                nextMatch.team2 = winnerName;
+                                const participantElement = document.querySelector(`.participant[data-match="${matchNum}"]`);
+                                if (participantElement) {
+                                    participantElement.textContent = winnerName;
+                                    participantElement.classList.add('winner-highlight');
+                                }
+                            }
+                        }
+                        
+                        // If this is the final match, update the champion
+                        if (matchId === `match-${matchCounter - 1}`) {
+                            document.getElementById('champion').textContent = winnerName;
+                        }
+                        
+                        // Add to winners list
+                        updateWinnersList(winnerName, match.round + 1);
+                    });
+                });
+            }
+            
+            // Function to update winners list
+            function updateWinnersList(winnerName, roundNumber) {
+                const listItem = document.createElement('li');
+                
+                // Get round name
+                let roundName;
+                switch(roundNumber) {
+                    case 1: roundName = "First Round"; break;
+                    case 2: roundName = "Second Round"; break;
+                    case 3: roundName = "Quarter-Finals"; break;
+                    case 4: roundName = "Semi-Finals"; break;
+                    case 5: roundName = "Final"; break;
+                    default: roundName = `Round ${roundNumber}`;
+                }
+                
+                listItem.textContent = `${roundName} Winner: ${winnerName}`;
+                winnersList.appendChild(listItem);
+            }
+            
+            // Helper function to create winner option radio button
+            function createWinnerOption(matchNum, value, label) {
+                const container = document.createElement('label');
+                container.className = 'winner-option';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `match-${matchNum}`;
+                radio.value = value;
+                
+                const text = document.createTextNode(` ${label}`);
+                
+                container.appendChild(radio);
+                container.appendChild(text);
+                
+                return container;
+            }
+            
+            // Helper function to get round name
+            function getRoundName(round, totalRounds) {
+                if (round === 0) return 'First Round';
+                if (round === totalRounds - 1) return 'Final';
+                if (round === totalRounds - 2) return 'Semi-Finals';
+                if (round === totalRounds - 3) return 'Quarter-Finals';
+                return `Round ${round + 1}`;
+            }
+            
+            // Helper function to shuffle array
+            function shuffleArray(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+        });
+    </script>
+</body>
+</html>
